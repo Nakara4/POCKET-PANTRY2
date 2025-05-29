@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { getDatabase, ref, set, remove, onValue } from 'firebase/database';
 import { auth } from '../firebase';
 import SearchBar from '../components/SearchBar';
 import RecipeFilter from '../components/RecipeFilter';
@@ -13,7 +14,38 @@ function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [error, setError] = useState(null);
 
-  
+  // Fetch saved recipes from Firebase
+  useEffect(() => {
+    console.log('Checking auth:', auth.currentUser);
+    if (auth.currentUser) {
+      const db = getDatabase();
+      const userRecipesRef = ref(db, `savedRecipes/${auth.currentUser.uid}`);
+      console.log('Listening to Firebase path:', `savedRecipes/${auth.currentUser.uid}`);
+      onValue(
+        userRecipesRef,
+        (snapshot) => {
+          const data = snapshot.val();
+          console.log('Firebase data:', data);
+          if (data) {
+            const recipes = Object.keys(data).map((key) => ({
+              id: key,
+              ...data[key],
+            }));
+            setSavedRecipes(recipes);
+          } else {
+            setSavedRecipes([]);
+          }
+        },
+        (err) => {
+          console.error('Firebase fetch error:', err);
+          setError(`Failed to fetch saved recipes: ${err.message}`);
+        }
+      );
+    } else {
+      setSavedRecipes([]);
+      setError('Please log in to save recipes.');
+    }
+  }, []);
 
   // Fetch recipes from API
   useEffect(() => {

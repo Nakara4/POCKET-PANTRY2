@@ -1,6 +1,6 @@
 import React from 'react';
 
-function RecipeCard({ recipe }) {
+function RecipeCard({ recipe, onSave, onDelete, isSaved = false }) {
   return (
     <div
       className="bg-gray-800 shadow-lg rounded-xl overflow-hidden p-6 space-y-3 text-gray-200
@@ -11,7 +11,7 @@ function RecipeCard({ recipe }) {
         alt={recipe.title}
         className="w-full h-44 object-cover rounded-lg"
       />
-      <h2 className="text-xl font-semibold">{recipe.title}</h2>
+      <h2 className="text-xl font-semibold text-white">{recipe.title}</h2>
       <p className="text-sm text-gray-400">
         <strong>Ready in:</strong> {recipe.readyInMinutes} mins
       </p>
@@ -31,7 +31,7 @@ function RecipeCard({ recipe }) {
         href={recipe.sourceUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-block mt-3 text-blue-400 hover:text-blue-600 hover:underline text-sm transition-colors duration-300"
+        className="inline-block mt-3 text-green-400 hover:text-green-600 hover:underline text-sm transition-colors duration-300"
       >
         View full recipe →
       </a>
@@ -44,6 +44,27 @@ function RecipeCard({ recipe }) {
           ))}
         </ul>
       </div>
+
+      {onSave && (
+        <button
+          onClick={() => onSave(recipe)}
+          className={`mt-3 px-4 py-2 rounded-md text-white font-medium transition-colors ${
+            isSaved ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'
+          }`}
+          aria-label={isSaved ? `Unsave ${recipe.title}` : `Save ${recipe.title}`}
+        >
+          {isSaved ? 'Unsave' : 'Save'}
+        </button>
+      )}
+      {onDelete && (
+        <button
+          onClick={() => onDelete(recipe.id)}
+          className="mt-3 px-4 py-2 rounded-md text-white font-medium bg-red-600 hover:bg-red-700 transition-colors"
+          aria-label={`Unsave ${recipe.title}`}
+        >
+          Unsave
+        </button>
+      )}
     </div>
   );
 }
