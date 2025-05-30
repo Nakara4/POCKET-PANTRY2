@@ -1,3 +1,4 @@
+// src/pages/Home.jsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { getDatabase, ref, set, remove, onValue } from 'firebase/database';
@@ -16,22 +17,21 @@ function Home() {
 
   // Fetch saved recipes from Firebase
   useEffect(() => {
-    console.log('Checking auth:', auth.currentUser);
     if (auth.currentUser) {
       const db = getDatabase();
       const userRecipesRef = ref(db, `savedRecipes/${auth.currentUser.uid}`);
-      console.log('Listening to Firebase path:', `savedRecipes/${auth.currentUser.uid}`);
-      onValue(
+
+      const unsubscribe = onValue(
         userRecipesRef,
         (snapshot) => {
           const data = snapshot.val();
-          console.log('Firebase data:', data);
           if (data) {
             const recipes = Object.keys(data).map((key) => ({
               id: key,
               ...data[key],
             }));
             setSavedRecipes(recipes);
+            setError(null);
           } else {
             setSavedRecipes([]);
           }
@@ -41,33 +41,34 @@ function Home() {
           setError(`Failed to fetch saved recipes: ${err.message}`);
         }
       );
+
+      // Cleanup listener on unmount
+      return () => unsubscribe();
     } else {
       setSavedRecipes([]);
       setError('Please log in to save recipes.');
     }
   }, []);
 
-  // Fetch recipes from API
+  // Fetch recipes from API with filters and search
   useEffect(() => {
     setError(null);
     axios
       .get('http://localhost:8000/recipes/?ingredients=rice')
       .then((res) => {
-        console.log('API Response:', res.data);
         let data = Array.isArray(res.data) ? res.data : res.data?.results || [];
         if (!Array.isArray(data)) {
-          console.warn('API data is not an array:', data);
           data = [];
         }
 
         // Apply search filter
         if (searchQuery.trim()) {
           data = data.filter((recipe) =>
-            recipe?.title?.toLowerCase?.()?.includes(searchQuery.toLowerCase()) ?? false
+            recipe?.title?.toLowerCase().includes(searchQuery.toLowerCase())
           );
         }
 
-        // Apply dietary filter
+        // Apply dietary filters
         if (filter === 'vegetarian') {
           data = data.filter((recipe) => recipe?.vegetarian === true);
         } else if (filter === 'vegan') {
@@ -79,6 +80,7 @@ function Home() {
         }
 
         setRecipes(data);
+
         if (data.length === 0) {
           let errorMessage = 'No recipes found';
           if (searchQuery || filter !== 'all') {
@@ -98,34 +100,28 @@ function Home() {
       });
   }, [filter, searchQuery]);
 
+  // Save or remove recipe for current user in Firebase
   const toggleSave = (recipe) => {
     if (!auth.currentUser) {
       setError('Please log in to save recipes.');
-      console.log('No user logged in');
       return;
     }
 
     const db = getDatabase();
     const recipeRef = ref(db, `savedRecipes/${auth.currentUser.uid}/${recipe.id}`);
-    console.log('Saving/Unsaving recipe:', recipe.id, 'at', `savedRecipes/${auth.currentUser.uid}/${recipe.id}`);
+
     if (savedRecipes.some((saved) => saved.id === recipe.id)) {
-      remove(recipeRef)
-        .then(() => {
-          console.log('Recipe unsaved:', recipe.id);
-        })
-        .catch((err) => {
-          console.error('Error unsaving recipe:', err);
-          setError(`Failed to unsave recipe: ${err.message}`);
-        });
+      // Unsave
+      remove(recipeRef).catch((err) => {
+        console.error('Error unsaving recipe:', err);
+        setError(`Failed to unsave recipe: ${err.message}`);
+      });
     } else {
-      set(recipeRef, recipe)
-        .then(() => {
-          console.log('Recipe saved:', recipe.id);
-        })
-        .catch((err) => {
-          console.error('Error saving recipe:', err);
-          setError(`Failed to save recipe: ${err.message}`);
-        });
+      // Save
+      set(recipeRef, recipe).catch((err) => {
+        console.error('Error saving recipe:', err);
+        setError(`Failed to save recipe: ${err.message}`);
+      });
     }
   };
 
