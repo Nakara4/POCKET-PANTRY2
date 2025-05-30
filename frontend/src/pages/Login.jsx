@@ -22,7 +22,7 @@ function Login() {
     setLoading(true);
     try {
       await googleSignIn();
-      navigate('/home'); // Redirect to home page after successful login
+      navigate('/About'); // Redirect to home page after successful login
     } catch (err) {
       console.error("Google login error: ", err.message);
       setError("Something went wrong with Google login.");
