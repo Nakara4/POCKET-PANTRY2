@@ -4,13 +4,16 @@ from routers import recipes
 
 app = FastAPI()
 
-# CORS middleware (allow frontend requests)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://nakara4.github.io/POCKET-PANTRY2/"],  # Change this to your frontend domain in production
+    allow_origins=["https://nakara4.github.io/POCKET-PANTRY2/"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 app.include_router(recipes.router)
+
+@app.get("/")
+def root():
+    return {"message": "✅ Pocket Pantry API is running"}
