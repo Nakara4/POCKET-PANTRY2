@@ -54,7 +54,7 @@ function Home() {
   useEffect(() => {
     setError(null);
     axios
-      .get('https://pocket-pantry2-1.onrender.com/recipes/')
+      .get('https://pocket-pantry2-6or3.onrender.com/recipes/')
       .then((res) => {
         let data = Array.isArray(res.data) ? res.data : res.data?.results || [];
         if (!Array.isArray(data)) {
