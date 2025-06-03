@@ -3,7 +3,7 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  base: '/pocket-pantry2/', // Matches your GitHub Pages URL
+  base: '/POCKET-PANTRY2/', // Matches your GitHub Pages URL
   plugins: [
     react(), // Enable React plugin
     tailwindcss(),
