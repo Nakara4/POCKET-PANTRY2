@@ -81,7 +81,7 @@ function App() {
       )}
 
       <Routes>
-        <Route path="/" element={<Landing />} />
+        <Route path="/POCKET-PANTRY2" element={<Landing />} />
         <Route
           path="/login"
           element={user ? <Navigate to="/home" replace /> : <Login />}
