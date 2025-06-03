@@ -6,7 +6,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://nakara4.github.io"],
+    allow_origins=["https://nakara4.github.io/POCKET-PANTRY2/"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
