@@ -4,7 +4,6 @@ from routers import recipes
 
 app = FastAPI()
 
-# FIXED: Correct frontend origin
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://nakara4.github.io"],
