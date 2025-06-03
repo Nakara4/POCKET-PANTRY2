@@ -11,7 +11,7 @@ def get_filtered_recipes(required_ingredients: List[str] = Query([])):
     response = requests.get(
         f"https://api.spoonacular.com/recipes/random",
         params={
-            "number": 40,
+            "number": 10,
             "apiKey": SPOONACULAR_API_KEY
         }
     )
