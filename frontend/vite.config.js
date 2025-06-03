@@ -1,14 +1,27 @@
-import { defineConfig } from 'vite';
-import tailwindcss from '@tailwindcss/vite';
-import react from '@vitejs/plugin-react';
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+import os
+from routers import recipes
 
-export default defineConfig({
-  base: './', // Matches your GitHub Pages URL
-  plugins: [
-    react(), // Enable React plugin
-    tailwindcss(),
-  ],
-  build: {
-    outDir: 'dist', // Ensure output goes to dist (matches workflow)
-  },
-});
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://nakara4.github.io/POCKET-PANTRY2/"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(recipes.router)
+
+
+@app.get("/")
+def root():
+    return {"message": "🍽️ Pocket Pantry API is live!"}
+
+@app.get("/favicon.ico")
+def favicon():
+    path = "path/to/favicon.ico"
+    return FileResponse(path) if os.path.exists(path) else {"detail": "No favicon"}
