@@ -3,11 +3,12 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
+  base: '/POCKET-PANTRY2/', 
   plugins: [
-    react(), // Enable React plugin
+    react(), 
     tailwindcss(),
   ],
   build: {
-    outDir: 'dist', // Ensure output goes to dist (matches workflow)
+    outDir: 'dist', 
   },
 });
